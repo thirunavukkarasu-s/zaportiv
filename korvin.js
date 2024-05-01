@@ -214,9 +214,9 @@ const verifyToken = async (ctx, next) => {
         ctx.body = { error: 'Price must be a number' };
         return;
     }
-    if (isNaN(parseInt(categoryId))) {
+    if (isNaN(categoryId) || !Number.isInteger(categoryId)) {
         ctx.status = 400;
-        ctx.body = { error: 'Category Id must be a number' };
+        ctx.body = { error: 'Category Id must be a valid number' };
         return;
     }
     return next();
