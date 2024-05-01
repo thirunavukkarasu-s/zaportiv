@@ -216,7 +216,7 @@ const verifyToken = async (ctx, next) => {
     }
     if (isNaN(categoryId) || !Number.isInteger(categoryId)) {
         ctx.status = 400;
-        ctx.body = { error: 'Category Id must be a valid number' };
+        ctx.body = { error: 'Category Id must be a valid integer' };
         return;
     }
     return next();
