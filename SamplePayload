@@ -1,0 +1,39 @@
+Sample payloads to create products:
+
+{
+    "name": "Television",
+    "code": "tv",
+    "description": "Sony Television",
+    "categoryId": 1,
+    "price": 20000,
+    "availability": 10
+}
+
+
+{
+    "name": "Television",
+    "code": "tv",
+    "description": "Samsung Television",
+    "categoryId": 15,
+    "price": 21000,
+    "availability": 1
+}
+
+{
+    "name": "Fan",
+    "code": "fan",
+    "description": "Crompton Fan",
+    "categoryId": 16,
+    "price": 2500,
+    "availability": 100
+}
+
+
+{
+    "name": "LED Light",
+    "code": "LED",
+    "description": "LED Light",
+    "categoryId": 16,
+    "price": 200,
+    "availability": 400
+}
