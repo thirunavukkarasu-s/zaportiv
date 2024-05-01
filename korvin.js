@@ -177,7 +177,7 @@ const verifyToken = async (ctx, next) => {
 
   const checkIsAdmin = async (ctx, next) => {
     if (ctx.state.user.role == 'admin') {
-        next();
+        await next();
     } else {
       ctx.status = 403;
       ctx.body = 'You are unauthorized for creating product!';
@@ -197,7 +197,7 @@ router.get('/products/:id', verifyToken, findById)
 
 router.get('/products/category/:id', verifyToken, findByCategoryId)
 
-router.post('/products', verifyToken, checkIsAdmin, create)
+router.post('/products', verifyToken, checkIsAdmin, koaBody(), create)
 
 app.use(router.routes())
 
