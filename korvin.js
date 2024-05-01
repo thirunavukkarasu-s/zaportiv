@@ -1,4 +1,3 @@
-
 const Koa = require('koa')
 const Router = require('koa-router')
 const { koaBody } = require('koa-body')
@@ -39,7 +38,15 @@ const findAll = async (ctx, next) => {
         const parsedUrl = url.parse(ctx.request.url)
         const segments = parsedUrl.pathname.split('/')
         const pool = await poolPromise;
-        const result = await pool.request().query(`select top 10 * from (SELECT top ${segments[3] * 10} * FROM products order by id desc) t`);
+        const pageNumber = segments[3]
+        const pageSize = 10
+        const result = await pool.request().query(`
+        SELECT * FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY id DESC) AS RowNum, * 
+            FROM products
+        ) AS t
+        WHERE RowNum BETWEEN ${(pageNumber - 1) * pageSize + 1} AND ${pageNumber * pageSize}
+        `);
         ctx.body = result.recordset;
         ctx.status = 200;
       } catch (err) {
@@ -68,9 +75,7 @@ const findById = async (ctx, next) => {
 
 const checkLogin = async (ctx, next) => {
     const { username, password } = ctx.request.body;
-
     // console.log(bcrypt.hash(password, 10))
-  
     try {
       const pool = await poolPromise;
       const result = await pool
@@ -86,7 +91,6 @@ const checkLogin = async (ctx, next) => {
   
       const user = result.recordset[0];
     //   const passwordMatch = await bcrypt.compare(password, user.Password);
-  
       if (password !== user.Password) {
         ctx.status = 401;
         ctx.body = 'Invalid username or password';
@@ -95,7 +99,6 @@ const checkLogin = async (ctx, next) => {
   
       // Generate JWT token
       const token = jwt.sign({ userId: user.Id, role: user.Role }, 'your_secret_key', { expiresIn: '1h' });
-  
       ctx.status = 200;
       ctx.body = { token };
     } catch (err) {
@@ -185,8 +188,6 @@ const verifyToken = async (ctx, next) => {
   };
   
 
-// app.use(koaBody())
-
 app.use(compress()) //to compress large data set
 
 router.post('/login', koaBody(), checkLogin)
@@ -202,4 +203,3 @@ router.post('/products', verifyToken, checkIsAdmin, koaBody(), create)
 app.use(router.routes())
 
 app.listen(3000)
-
