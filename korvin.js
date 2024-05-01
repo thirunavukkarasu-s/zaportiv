@@ -200,6 +200,27 @@ const verifyToken = async (ctx, next) => {
       ctx.body = 'You are unauthorized for creating product!';
     }
   };
+
+  const validateProductInput = (ctx, next) => {
+    const { name, code, description, categoryId, price, availability } = ctx.request.body;
+    if (!name || !code || !price || !availability) {
+        ctx.status = 400;
+        ctx.body = { error: 'Missing required fields' };
+        return;
+    }
+    // Additional validation logic for specific fields (e.g., check if price is a number)
+    if (isNaN(parseFloat(price))) {
+        ctx.status = 400;
+        ctx.body = { error: 'Price must be a number' };
+        return;
+    }
+    if (isNaN(parseInt(categoryId))) {
+        ctx.status = 400;
+        ctx.body = { error: 'Category Id must be a number' };
+        return;
+    }
+    return next();
+};
   
 
 app.use(compress()) //to compress large data set
@@ -214,7 +235,7 @@ router.get('/products/:id', verifyToken, findById)
 
 router.get('/products/category/:id', verifyToken, findByCategoryId)
 
-router.post('/products', verifyToken, checkIsAdmin, koaBody(), create)
+router.post('/products', verifyToken, checkIsAdmin, koaBody(), validateProductInput, create)
 
 app.use(router.routes())
 
