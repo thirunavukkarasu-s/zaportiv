@@ -1,76 +1,39 @@
 USE [Korvin]
 GO
-/****** Object:  Table [dbo].[Categories]    Script Date: 5/1/2024 7:03:45 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Categories](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Name] [varchar](50) NOT NULL,
-	[Code] [varchar](50) NOT NULL,
- CONSTRAINT [PK_Categories] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
+
+CREATE TABLE dbo.Categories (
+    Id int IDENTITY(1,1) PRIMARY KEY,
+    Name varchar(50) NOT NULL,
+    Code varchar(50) NOT NULL
+) ON [PRIMARY];
 GO
 
-	
-/****** Object:  Table [dbo].[Products]    Script Date: 5/1/2024 7:03:45 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Products](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Name] [varchar](50) NOT NULL,
-	[Code] [varchar](20) NOT NULL,
-	[Description] [varchar](500) NULL,
-	[CategoryId] [int] NULL,
-	[Price] [decimal](18, 2) NOT NULL,
-	[Availability] [int] NOT NULL,
- CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
+CREATE TABLE dbo.Products (
+    Id int IDENTITY(1,1) PRIMARY KEY,
+    Name varchar(50) NOT NULL,
+    Code varchar(20) NOT NULL,
+    Description varchar(500) NULL,
+    CategoryId int NULL,
+    Price decimal(18, 2) NOT NULL,
+    Availability int NOT NULL
+) ON [PRIMARY];
 GO
 
-	
-/****** Object:  Table [dbo].[Roles]    Script Date: 5/1/2024 7:03:45 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Roles](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Name] [varchar](50) NOT NULL,
-	[Code] [varchar](50) NOT NULL,
- CONSTRAINT [PK_Roles] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
+CREATE TABLE dbo.Roles (
+    Id int IDENTITY(1,1) PRIMARY KEY,
+    Name varchar(50) NOT NULL,
+    Code varchar(50) NOT NULL
+) ON [PRIMARY];
 GO
 
-	
-/****** Object:  Table [dbo].[Users]    Script Date: 5/1/2024 7:03:45 PM ******/
-SET ANSI_NULLS ON
+CREATE TABLE dbo.Users (
+    Id int IDENTITY(1,1) PRIMARY KEY,
+    Name varchar(50) NOT NULL,
+    RoleId int NOT NULL,
+    [Password] varchar(255) NOT NULL
+) ON [PRIMARY];
 GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Users](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Name] [varchar](50) NOT NULL,
-	[RoleId] [int] NOT NULL,
-	[Password] [varchar](50) NOT NULL,
- CONSTRAINT [PK_Usesrs] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
+
 ALTER TABLE [dbo].[Products]  WITH CHECK ADD  CONSTRAINT [FK_Products_Categories] FOREIGN KEY([CategoryId])
 REFERENCES [dbo].[Categories] ([Id])
 GO
@@ -82,4 +45,4 @@ ALTER TABLE [dbo].[Users]  WITH CHECK ADD  CONSTRAINT [FK_Users_Roles] FOREIGN K
 REFERENCES [dbo].[Roles] ([Id])
 GO
 ALTER TABLE [dbo].[Users] CHECK CONSTRAINT [FK_Users_Roles]
-
+GO
