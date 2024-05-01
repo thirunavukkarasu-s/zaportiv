@@ -185,7 +185,7 @@ const verifyToken = async (ctx, next) => {
   };
   
 
-app.use(koaBody())
+// app.use(koaBody())
 
 app.use(compress()) //to compress large data set
 
