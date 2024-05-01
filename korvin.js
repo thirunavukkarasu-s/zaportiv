@@ -3,7 +3,7 @@ const Router = require('koa-router')
 const { koaBody } = require('koa-body')
 const url = require('url')
 const sql = require('mssql');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const compress = require('koa-compress')
 
@@ -33,7 +33,7 @@ const config = {
       process.exit(1);
     });
   
-const findAll = async (ctx, next) => {
+const findByPagination = async (ctx, next) => {
     try {
         const parsedUrl = url.parse(ctx.request.url)
         const segments = parsedUrl.pathname.split('/')
@@ -47,6 +47,20 @@ const findAll = async (ctx, next) => {
         ) AS t
         WHERE RowNum BETWEEN ${(pageNumber - 1) * pageSize + 1} AND ${pageNumber * pageSize}
         `);
+        ctx.body = result.recordset;
+        ctx.status = 200;
+      } catch (err) {
+        console.error('Error querying database:', err);
+        ctx.status = 500;
+        ctx.body = 'Error querying database';
+      }
+      next()
+}
+
+const findAll = async (ctx, next) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request().query(`SELECT * FROM products`);
         ctx.body = result.recordset;
         ctx.status = 200;
       } catch (err) {
@@ -75,7 +89,7 @@ const findById = async (ctx, next) => {
 
 const checkLogin = async (ctx, next) => {
     const { username, password } = ctx.request.body;
-    // console.log(bcrypt.hash(password, 10))
+    console.log(await bcrypt.hash(password, 10))
     try {
       const pool = await poolPromise;
       const result = await pool
@@ -90,8 +104,8 @@ const checkLogin = async (ctx, next) => {
       }
   
       const user = result.recordset[0];
-    //   const passwordMatch = await bcrypt.compare(password, user.Password);
-      if (password !== user.Password) {
+      const passwordMatch = await bcrypt.compare(password, user.Password);
+      if (!passwordMatch) {
         ctx.status = 401;
         ctx.body = 'Invalid username or password';
         return;
@@ -192,7 +206,9 @@ app.use(compress()) //to compress large data set
 
 router.post('/login', koaBody(), checkLogin)
 
-router.get('/products/page/:number', verifyToken,  findAll) //for pagination
+router.get('/products/page/:number', verifyToken,  findByPagination) //for pagination
+
+router.get('/products', verifyToken,  findAll) 
 
 router.get('/products/:id', verifyToken, findById)
 
