@@ -6,6 +6,7 @@ const sql = require('mssql');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const compress = require('koa-compress')
+const crypto = require('crypto');
 
 const app = new Koa()
 const router = new Router()
@@ -32,6 +33,8 @@ const config = {
       console.error('Error connecting to SQL Server:', err);
       process.exit(1);
     });
+
+const secretKey =  crypto.randomBytes(32).toString('hex');
   
 const findByPagination = async (ctx, next) => {
     try {
@@ -112,7 +115,7 @@ const checkLogin = async (ctx, next) => {
       }
   
       // Generate JWT token
-      const token = jwt.sign({ userId: user.Id, role: user.Role }, 'your_secret_key', { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user.Id, role: user.Role }, secretKey, { expiresIn: '1h' });
       ctx.status = 200;
       ctx.body = { token };
     } catch (err) {
@@ -182,7 +185,7 @@ const verifyToken = async (ctx, next) => {
     const token = authorizationHeader.split(' ')[1];
   
     try {
-      const decodedToken = jwt.verify(token, 'your_secret_key');
+      const decodedToken = jwt.verify(token, secretKey);
       ctx.state.user = decodedToken;
       console.log(ctx.state.user)
       await next(); // Proceed to the next middleware
